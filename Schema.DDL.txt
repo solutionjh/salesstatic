@@ -1,0 +1,226 @@
+
+CREATE TABLE Contact
+(
+  customerId   VARCHAR NOT NULL UNIQUE,
+  contactName  VARCHAR NOT NULL UNIQUE,
+  solutionName VARCHAR NOT NULL,
+  position     VARCHAR,
+  area         VARCHAR,
+  workGB       VARCHAR,
+  officeNumber NUMERIC,
+  phoneNumber  NUMERIC,
+  email        VARCHAR,
+  lastSurvey   NUMERIC,
+  lastUpdate   date   ,
+  PRIMARY KEY (customerId, contactName)
+);
+
+COMMENT ON TABLE Contact IS '고객사담당자정보';
+
+COMMENT ON COLUMN Contact.customerId IS '고객사코드';
+
+COMMENT ON COLUMN Contact.contactName IS '고객사담당자이름';
+
+COMMENT ON COLUMN Contact.solutionName IS '솔루션명';
+
+COMMENT ON COLUMN Contact.position IS '직책';
+
+COMMENT ON COLUMN Contact.area IS '구축업무';
+
+COMMENT ON COLUMN Contact.workGB IS '역할구분';
+
+COMMENT ON COLUMN Contact.officeNumber IS '사무실전화번호';
+
+COMMENT ON COLUMN Contact.phoneNumber IS '휴대폰전화번호';
+
+COMMENT ON COLUMN Contact.email IS '이메일주소';
+
+COMMENT ON COLUMN Contact.lastSurvey IS '고객만족도조사해';
+
+COMMENT ON COLUMN Contact.lastUpdate IS '최종수정일자';
+
+CREATE TABLE Contract
+(
+  customerId        VARCHAR NOT NULL UNIQUE,
+  solutionName      VARCHAR NOT NULL UNIQUE,
+  contractStartDate date    NOT NULL UNIQUE,
+  projectName       VARCHAR NOT NULL,
+  contractAmt       numeric NOT NULL DEFAULT 0,
+  contractEndDate   date    NOT NULL,
+  contractYear      VARCHAR NOT NULL,
+  contractMonth     VARCHAR NOT NULL,
+  contractPeriod    int     NOT NULL DEFAULT 12,
+  contractGB        VARCHAR,
+  etc               VARCHAR,
+  PRIMARY KEY (customerId, solutionName, contractStartDate)
+);
+
+COMMENT ON TABLE Contract IS '계약정보';
+
+COMMENT ON COLUMN Contract.customerId IS '고객사코드';
+
+COMMENT ON COLUMN Contract.solutionName IS '솔루션명';
+
+COMMENT ON COLUMN Contract.contractStartDate IS '계약시작일';
+
+COMMENT ON COLUMN Contract.projectName IS '프로젝트명';
+
+COMMENT ON COLUMN Contract.contractAmt IS '계약금액';
+
+COMMENT ON COLUMN Contract.contractEndDate IS '계약종료일';
+
+COMMENT ON COLUMN Contract.contractYear IS '계약년도';
+
+COMMENT ON COLUMN Contract.contractMonth IS '계약월';
+
+COMMENT ON COLUMN Contract.contractPeriod IS '계약기간';
+
+COMMENT ON COLUMN Contract.contractGB IS '계약구분';
+
+COMMENT ON COLUMN Contract.etc IS '기타정보';
+
+CREATE TABLE Customer
+(
+  industryCode VARCHAR NOT NULL,
+  customerId   VARCHAR NOT NULL UNIQUE,
+  customerName varchar,
+  PRIMARY KEY (customerId)
+);
+
+COMMENT ON TABLE Customer IS '고객정보';
+
+COMMENT ON COLUMN Customer.industryCode IS '업권코드';
+
+COMMENT ON COLUMN Customer.customerId IS '고객사코드';
+
+COMMENT ON COLUMN Customer.customerName IS '고객사명';
+
+CREATE TABLE Industry
+(
+  industryCode VARCHAR NOT NULL UNIQUE,
+  industryName VARCHAR,
+  PRIMARY KEY (industryCode)
+);
+
+COMMENT ON TABLE Industry IS '업권정보';
+
+COMMENT ON COLUMN Industry.industryCode IS '업권코드';
+
+COMMENT ON COLUMN Industry.industryName IS '업권명';
+
+CREATE TABLE Maintenance
+(
+  customerId         VARCHAR NOT NULL,
+  solutionName       VARCHAR NOT NULL,
+  startDate          date    NOT NULL,
+  area               VARCHAR,
+  endDate            date   ,
+  mainAccountManager VARCHAR,
+  subAccountManager  VARCHAR,
+  PRIMARY KEY (customerId, solutionName, startDate)
+);
+
+COMMENT ON TABLE Maintenance IS '유지보수정보';
+
+COMMENT ON COLUMN Maintenance.customerId IS '고객사코드';
+
+COMMENT ON COLUMN Maintenance.solutionName IS '솔루션명';
+
+COMMENT ON COLUMN Maintenance.startDate IS '시작일자';
+
+COMMENT ON COLUMN Maintenance.area IS '구축업무';
+
+COMMENT ON COLUMN Maintenance.endDate IS '종료일자';
+
+COMMENT ON COLUMN Maintenance.mainAccountManager IS '정담당자';
+
+COMMENT ON COLUMN Maintenance.subAccountManager IS '부담당자';
+
+CREATE TABLE OccupancyStatus
+(
+  customerId      VARCHAR NOT NULL UNIQUE,
+  solutionName    VARCHAR NOT NULL UNIQUE,
+  area            VARCHAR NOT NULL UNIQUE,
+  winBackYN       VARCHAR,
+  solutionVersion VARCHAR,
+  licenseInfo     VARCHAR,
+  etc             VARCHAR,
+  PRIMARY KEY (customerId, solutionName, area)
+);
+
+COMMENT ON TABLE OccupancyStatus IS '점유현황';
+
+COMMENT ON COLUMN OccupancyStatus.customerId IS '고객사코드';
+
+COMMENT ON COLUMN OccupancyStatus.solutionName IS '솔루션명';
+
+COMMENT ON COLUMN OccupancyStatus.area IS '구축업무';
+
+COMMENT ON COLUMN OccupancyStatus.winBackYN IS '윈백여부';
+
+COMMENT ON COLUMN OccupancyStatus.solutionVersion IS '솔루션버전';
+
+COMMENT ON COLUMN OccupancyStatus.licenseInfo IS '라이선스정보';
+
+COMMENT ON COLUMN OccupancyStatus.etc IS '비고';
+
+CREATE TABLE Solution
+(
+  solutionName VARCHAR NOT NULL UNIQUE,
+  Company      VARCHAR NOT NULL,
+  solutionGB   VARCHAR NOT NULL,
+  PRIMARY KEY (solutionName)
+);
+
+COMMENT ON TABLE Solution IS '솔루션정보';
+
+COMMENT ON COLUMN Solution.solutionName IS '솔루션명';
+
+COMMENT ON COLUMN Solution.Company IS '제조사';
+
+COMMENT ON COLUMN Solution.solutionGB IS '솔루션구분';
+
+ALTER TABLE Customer
+  ADD CONSTRAINT FK_Industry_TO_Customer
+    FOREIGN KEY (industryCode)
+    REFERENCES Industry (industryCode);
+
+ALTER TABLE Contract
+  ADD CONSTRAINT FK_Customer_TO_Contract
+    FOREIGN KEY (customerId)
+    REFERENCES Customer (customerId);
+
+ALTER TABLE Contract
+  ADD CONSTRAINT FK_Solution_TO_Contract
+    FOREIGN KEY (solutionName)
+    REFERENCES Solution (solutionName);
+
+ALTER TABLE Maintenance
+  ADD CONSTRAINT FK_Solution_TO_Maintenance
+    FOREIGN KEY (solutionName)
+    REFERENCES Solution (solutionName);
+
+ALTER TABLE Maintenance
+  ADD CONSTRAINT FK_Customer_TO_Maintenance
+    FOREIGN KEY (customerId)
+    REFERENCES Customer (customerId);
+
+ALTER TABLE Contact
+  ADD CONSTRAINT FK_Customer_TO_Contact
+    FOREIGN KEY (customerId)
+    REFERENCES Customer (customerId);
+
+ALTER TABLE Contact
+  ADD CONSTRAINT FK_Solution_TO_Contact
+    FOREIGN KEY (solutionName)
+    REFERENCES Solution (solutionName);
+
+ALTER TABLE OccupancyStatus
+  ADD CONSTRAINT FK_Customer_TO_OccupancyStatus
+    FOREIGN KEY (customerId)
+    REFERENCES Customer (customerId);
+
+ALTER TABLE OccupancyStatus
+  ADD CONSTRAINT FK_Solution_TO_OccupancyStatus
+    FOREIGN KEY (solutionName)
+    REFERENCES Solution (solutionName);
