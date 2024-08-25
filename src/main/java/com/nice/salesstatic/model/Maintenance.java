@@ -17,5 +17,4 @@ import lombok.ToString;
     private final LocalDate endDate;
     private final String mainAccountManager;
     private final String subAccountManager;
-
 }
